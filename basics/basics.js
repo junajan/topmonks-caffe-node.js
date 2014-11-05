@@ -1,6 +1,6 @@
 
 
-setTimeout(function() {
+setTimeout(function(){
 	console.log("Jsem nahore");
 });
 

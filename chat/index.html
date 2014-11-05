@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Naše super stránka</title>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+	<script src="/reload/reload.js"></script>
+    <script src='/socket.io/socket.io.js'></script>
+
+	<style type="text/css">
+		label {
+			display: block;
+			margin-top: 10px;
+			margin-bottom: 3px;
+		}
+
+		#messages>div>*{
+			padding: 5px;
+		}
+
+		#messages>div{
+			margin-top: 10px;
+			padding: 5px;
+			border-bottom: 1px solid red;
+		}
+		#messages>div:nth-child(2n){
+		}
+	</style>
+</head>
+<body>
+	<div style="width: 600px;">
+		<h1>Náš super chat!</h1>
+		<form onsubmit="magic(); return false;">
+			<label>Nick:</label>
+			<input type="text" id="nick" name="nick" value="" /><br />
+			<label>Text:</label>
+			<textarea name="text" id="text" cols="40" rows="3"></textarea>
+			<br />
+			<button>Do magic!</button>
+		</form>
+		<br />
+		<br />
+		<h2>Zprávy (<i id="totalCount"></i>)</h2>
+		<div id="messages">
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+
+	var socket = io.connect();
+
+	socket.on('count', function(count) {
+		$("#totalCount").html(count);
+	});
+
+	socket.on('receive', addMessage);
+
+	function clearForm() {
+		$("#text").val('');
+	}
+	
+	function addMessage(msg) {
+		console.log(msg);
+		var newMessage = '<div><i>'+msg.date+'</i><b>'+msg.nick+'</b>: <span>'+msg.text+'</span></div>';
+		$("#messages").prepend(newMessage);
+	}
+
+	function getFormMsg() {
+		return msg = {
+			nick: $("#nick").val(),
+			text: $("#text").val()
+		};
+	}
+
+	function magic() {
+		var msg = getFormMsg();
+
+		if(msg.text == '' || msg.nick == '')
+			return alert('Všechna pole jsou povinná');
+
+		socket.emit('send', msg);
+	}
+
+</script>
+</html>

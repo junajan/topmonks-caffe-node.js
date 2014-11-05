@@ -1,13 +1,10 @@
 {
-  "name": "node-basics",
+  "name": "basics",
   "version": "0.0.0",
   "description": "",
-  "main": "basics.js",
-  "scripts": {},
+  "main": "stock.js",
+  "scripts": {
+  },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "async": "^0.9.0",
-    "request": "^2.47.0"
-  }
+  "license": "ISC"
 }
