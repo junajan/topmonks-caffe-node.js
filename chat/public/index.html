@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Náš super chat</title>
+</head>
+<body>
+	<div id="messages">
+		<div class="message">
+			<i>12.34.2014 12:34</i><b>Nick</b>: <span>Nejaka zprava</span>
+		</div>
+	</div>
+	<form>
+		<input type="text" id="nick" name="nick" value="" />
+		<textarea name="text" id="text" cols="200" rows="3"></textarea>
+		<button type="submit" value="Do magic!"></button>
+	</form>
+</body>
+<script type="text/javascript">
+	
+	$(document).ready(function () {
+		function clearForm() {
+
+			// nastavi formulari prazdne hodnoty
+			$("#text").val('');
+		}
+		
+		function addMessage(msg) {
+			var newMessage = '<div><i>'+msg.date+'</i><b>'+msg.nick+'</b>: <span>'+msg.text+'</span></div>';
+			$("#messages").append();
+		}
+
+		function getFormMsg() {
+			return msg = {
+				nick: $("#nick").val(),
+				text: $("#text").val()
+			};
+		}
+
+		function magic() {
+			var msg = getFormMsg();
+
+			if(msg.text == '' || msg.nick == '')
+				return alert('Všechna pole jsou povinná');
+		}
+	});
+</script>
+</html>
