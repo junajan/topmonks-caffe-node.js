@@ -32,7 +32,6 @@ io.sockets.on('connection', function(socket) {
 	socket.on('send', function(msg) {
 
 		msg.date = dateFormat(new Date(), "dd. mm. yyyy h:MM:ss");
-		console.log("Received: ", msg);
 
 		messages.push(msg);
 		io.emit('receive', msg);

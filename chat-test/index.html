@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Naše super stránka</title>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+	<script type="text/javascript" src="reload/reload.js"></script>
+	<script type="text/javascript" src="socket.io/socket.io.js"></script>
+	<style type="text/css">
+		label {
+			display: block;
+			margin-top: 10px;
+			margin-bottom: 3px;
+		}
+
+		body {
+			position: relative;
+		}
+
+		#messages>div>*{
+			padding: 5px;
+		}
+
+		#messages>div{
+			margin-top: 10px;
+			padding: 5px;
+			border-bottom: 1px solid red;
+		}
+		#messages>div:nth-child(2n){
+		}
+	</style>
+</head>
+<body>
+	<div style="width: 600px;">
+		<h1>Náš super chat!</h1>
+		<form onsubmit="doMagic(); return false;">
+			<label>Nick:</label>
+			<input type="text" id="nick" name="nick" value="" /><br />
+			<label>Text:</label>
+			<textarea name="text" id="text" cols="40" rows="3"></textarea>
+			<br />
+			<button>Do magic!</button>
+		</form>
+		<br />
+		<br />
+		<h2>Zprávy (<i id="totalCount"></i>)</h2>
+		<div id="messages">
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var socket = io.connect();
+
+	socket.on('count', function (count) {
+		$("#totalCount").html(count);
+	});
+
+	socket.on('receive', function(msg) {
+
+		$("#messages").prepend("<div><span>"+msg.time+"</span><b>"+msg.nick+"</b><span>"+msg.text+"</span>");
+	});
+
+	function doMagic() {
+
+		var msg = {
+			text: $("#text").val(),
+			nick: $("#nick").val()
+		};
+
+		socket.emit('send', msg);
+		$("#text").val("");
+	}
+
+	socket.on("moved", function(obj) {
+		if(! $("#o_"+obj.id).length){
+			$("body").append("<div style='position: absolute; border: 1px solid red; width: 20px; height: 20px;' id='o_"+obj.id+"'><div>");
+		}
+		
+		$("#o_"+obj.id).css({top: obj.pos.top, left: obj.pos.left});
+	});
+
+	document.addEventListener('touchmove', function(e) {
+	    e.preventDefault();
+	    var touch = e.touches[0];
+	    socket.emit("move", {left: touch.pageX, top: touch.pageY});
+	}, false);
+
+	$( "body" ).mousemove(function( event ) {
+	    socket.emit("move", {left: event.pageX, top: event.pageY});
+	});
+
+</script>
+</html>
