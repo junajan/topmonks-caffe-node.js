@@ -1,12 +1,14 @@
 {
-  "name": "basics",
+  "name": "priklady",
   "version": "0.0.0",
   "description": "",
-  "main": "stock.js",
+  "main": "app.js",
   "scripts": {},
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^0.9.0"
+    "date-format": "0.0.2",
+    "express": "^4.10.1",
+    "socket.io": "^1.2.0"
   }
 }

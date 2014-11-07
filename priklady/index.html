@@ -8,17 +8,13 @@
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
-	<script type="text/javascript" src="reload/reload.js"></script>
-	<script type="text/javascript" src="socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
 	<style type="text/css">
 		label {
 			display: block;
 			margin-top: 10px;
 			margin-bottom: 3px;
-		}
-
-		body {
-			position: relative;
 		}
 
 		#messages>div>*{
@@ -36,7 +32,7 @@
 </head>
 <body>
 	<div style="width: 600px;">
-		<h1>Náš super chat!</h1>
+		<h1>Náš super chat! - nodejs.cz:4444</h1>
 		<form onsubmit="doMagic(); return false;">
 			<label>Nick:</label>
 			<input type="text" id="nick" name="nick" value="" /><br />
@@ -53,44 +49,47 @@
 	</div>
 </body>
 <script type="text/javascript">
+	
 	var socket = io.connect();
 
-	socket.on('count', function (count) {
-		$("#totalCount").html(count);
-	});
-
-	socket.on('receive', function(msg) {
-
-		$("#messages").prepend("<div><span>"+msg.time+"</span><b>"+msg.nick+"</b><span>"+msg.text+"</span>");
+	socket.on("ahoj", function (data) {
+		alert(data);
 	});
 
 	function doMagic() {
 
 		var msg = {
-			text: $("#text").val(),
-			nick: $("#nick").val()
+			nick: $("#nick").val(),
+			text: $("#text").val()
 		};
 
-		socket.emit('send', msg);
-		$("#text").val("");
+		socket.emit("send", msg);
 	}
 
-	socket.on("moved", function(obj) {
-		if(! $("#o_"+obj.id).length){
-			$("body").append("<div style='position: absolute; border: 1px solid red; width: 20px; height: 20px;' id='o_"+obj.id+"'><div>");
-		}
-		
-		$("#o_"+obj.id).css({top: obj.pos.top, left: obj.pos.left});
+	socket.on("count", function(count) {
+		$("#totalCount").html(count);
+	});
+	socket.on("receive", function(msg) {
+		$("#messages").prepend("<div><span>"+msg.time+"</span><b>"+msg.nick+"</b><i>"+msg.text+"</i></div>");
 	});
 
+	$( "body" ).mousemove(function( event ) {
+	    socket.emit("move", {left: event.pageX, top: event.pageY});
+	});
+	
 	document.addEventListener('touchmove', function(e) {
 	    e.preventDefault();
 	    var touch = e.touches[0];
 	    socket.emit("move", {left: touch.pageX, top: touch.pageY});
 	}, false);
 
-	$( "body" ).mousemove(function( event ) {
-	    socket.emit("move", {left: event.pageX, top: event.pageY});
+	socket.on("moved", function(obj) {
+
+		if(!$("#o_"+obj.id).length) {
+			$("body").append("<div style='width: 20px; height: 20px; border: 1px solid red; position: absolute;' id='o_"+obj.id+"'></div>");
+		}
+
+		$("#o_"+obj.id).css({left: obj.left, top: obj.top});
 	});
 
 </script>

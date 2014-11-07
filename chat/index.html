@@ -8,14 +8,17 @@
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
-	<script src="/reload/reload.js"></script>
-    <script src='/socket.io/socket.io.js'></script>
-
+	<script type="text/javascript" src="reload/reload.js"></script>
+	<script type="text/javascript" src="socket.io/socket.io.js"></script>
 	<style type="text/css">
 		label {
 			display: block;
 			margin-top: 10px;
 			margin-bottom: 3px;
+		}
+
+		body {
+			position: relative;
 		}
 
 		#messages>div>*{
@@ -34,7 +37,7 @@
 <body>
 	<div style="width: 600px;">
 		<h1>Náš super chat!</h1>
-		<form onsubmit="magic(); return false;">
+		<form onsubmit="doMagic(); return false;">
 			<label>Nick:</label>
 			<input type="text" id="nick" name="nick" value="" /><br />
 			<label>Text:</label>
@@ -50,40 +53,50 @@
 	</div>
 </body>
 <script type="text/javascript">
-
 	var socket = io.connect();
 
-	socket.on('count', function(count) {
+	socket.on('count', function (count) {
 		$("#totalCount").html(count);
 	});
 
-	socket.on('receive', addMessage);
+	socket.on('receive', function(msg) {
 
-	function clearForm() {
-		$("#text").val('');
-	}
-	
-	function addMessage(msg) {
-		console.log(msg);
-		var newMessage = '<div><i>'+msg.date+'</i><b>'+msg.nick+'</b>: <span>'+msg.text+'</span></div>';
-		$("#messages").prepend(newMessage);
-	}
+		$("#messages").prepend("<div><span>"+msg.time+"</span><b>"+msg.nick+"</b><span>"+msg.text+"</span>");
+	});
 
-	function getFormMsg() {
-		return msg = {
-			nick: $("#nick").val(),
-			text: $("#text").val()
+	function doMagic() {
+
+		var msg = {
+			text: $("#text").val(),
+			nick: $("#nick").val()
 		};
-	}
-
-	function magic() {
-		var msg = getFormMsg();
-
-		if(msg.text == '' || msg.nick == '')
-			return alert('Všechna pole jsou povinná');
 
 		socket.emit('send', msg);
+		$("#text").val("");
 	}
+
+	socket.on("moved", function(obj) {
+		if(! $("#o_"+obj.id).length){
+			$("body").append("<div style='position: absolute; border: 1px solid red; width: 20px; height: 20px;' id='o_"+obj.id+"'><div>");
+		}
+		
+		$("#o_"+obj.id).css({top: obj.pos.top, left: obj.pos.left});
+	});
+
+	document.addEventListener('touchmove', function(e) {
+	    e.preventDefault();
+	    var touch = e.touches[0];
+	    socket.emit("move", {left: touch.pageX, top: touch.pageY});
+	}, false);
+
+	$( "body" ).mousemove(function( event ) {
+	    socket.emit("move", {left: event.pageX, top: event.pageY});
+	});
+	
+	$( document ).on('vmousemove', function( event ) {
+		alert(event);
+	    socket.emit("move", {left: event.pageX, top: event.pageY});
+	});
 
 </script>
 </html>
